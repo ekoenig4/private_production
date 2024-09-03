@@ -6,7 +6,7 @@ if [ -z $JOBNUM ]; then
     exit 1
 fi
 
-EVENTS=$2
+EVENTS="${2#events=}"
 if [ -z $EVENTS ]; then
     EVENTS=10
     echo "Using default number of events: $EVENTS"
