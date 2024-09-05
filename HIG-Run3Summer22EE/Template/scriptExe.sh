@@ -48,20 +48,14 @@ build_cmssw() {
 run() {
 
     export SCRIPT=$1
-    REPORT_NAME=${SCRIPT}_report.xml
+    REPORT_NAME=FrameworkJobReport.xml
     shift 1
 
     export ARGS=$@
 
-    # check if fileout exists
-    if [ -f $SCRIPT.root ]; then
-        echo "Output file $SCRIPT.root already exists. Skipping job." | tee -a job.log
-
-    else
-
     echo "================= CMSRUN setting up $SCRIPT step ====================" | tee -a job.log
 
-    cmsDriver.py $ARGS --python_filename $SCRIPT.py --fileout file:$SCRIPT.root -n $EVENTS || exit $? ;
+    cmsDriver.py $ARGS --python_filename $SCRIPT.py -n $EVENTS || exit $? ;
 
     echo "================= CMSRUN starting $SCRIPT step ====================" | tee -a job.log
 
@@ -70,23 +64,24 @@ run() {
 
     if [ $status -ne 0 ]; then
         echo "================= CMSRUN error with exit status $status ====================" | tee -a job.log
-        rm -f $SCRIPT.root
+        rm -f *.root
         exit $status
     fi
 
-    fi
 }
 
 export SCRAM_ARCH=el8_amd64_gcc10
 build_cmssw 12_4_14_patch3
 run 0_HIG-Run3Summer22EEwmLHEGS \
     Configuration/GenProduction/python/HIG-Run3Summer22EEwmLHEGS-00282-fragment.py \
+    --fileout "file:0_HIG-Run3Summer22EEwmLHEGS.root" \
     --eventcontent RAWSIM,LHE --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM,LHE --conditions 124X_mcRun3_2022_realistic_postEE_v1 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})"\\nprocess.source.firstLuminosityBlock="cms.untracked.uint32(${JOBNUM})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${EVENTS})" --step LHE,GEN,SIM --geometry DB:Extended --era Run3 --no_exec --mc || exit $? ;
 
 export SCRAM_ARCH=el8_amd64_gcc10
 build_cmssw 12_4_14_patch3
 run 1_HIG-Run3Summer22EEDRPremix \
     --filein "file:0_HIG-Run3Summer22EEwmLHEGS.root" \
+    --fileout "file:1_HIG-Run3Summer22EEDRPremix.root" \
     --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-RAW --pileup_input "dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX" --conditions 124X_mcRun3_2022_realistic_postEE_v1 --step DIGI,DATAMIX,L1,DIGI2RAW,HLT:2022v14 --procModifiers premix_stage2,siPixelQualityRawToDigi --geometry DB:Extended  --datamix PreMix --era Run3 --no_exec --mc || exit $? ;
 
 
@@ -94,19 +89,21 @@ export SCRAM_ARCH=el8_amd64_gcc10
 build_cmssw 12_4_14_patch3
 run 2_HIG-Run3Summer22EEAOD \
     --filein "file:1_HIG-Run3Summer22EEDRPremix.root" \
+    --fileout "file:2_HIG-Run3Summer22EEAOD.root" \
     --eventcontent AODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier AODSIM --conditions 124X_mcRun3_2022_realistic_postEE_v1 --step RAW2DIGI,L1Reco,RECO,RECOSIM --procModifiers siPixelQualityRawToDigi --geometry DB:Extended --era Run3 --no_exec --mc || exit $? ;
 
 export SCRAM_ARCH=el8_amd64_gcc11
 build_cmssw 13_0_13
 run 3_HIG-Run3Summer22EEMiniAODv4 \
     --filein "file:2_HIG-Run3Summer22EEAOD.root" \
+    --fileout "file:3_HIG-Run3Summer22EEMiniAODv4.root" \
     --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --conditions 130X_mcRun3_2022_realistic_postEE_v6 --step PAT --geometry DB:Extended --era Run3,run3_miniAOD_12X --no_exec --mc || exit $? ;
 
 export SCRAM_ARCH=el8_amd64_gcc11
 build_cmssw 13_0_13
 run 4_HIG-Run3Summer22EENanoAODv12 \
     --filein "file:3_HIG-Run3Summer22EEMiniAODv4.root" \
+    --fileout "file:ntuple.root" \
     --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --conditions 130X_mcRun3_2022_realistic_postEE_v6 --step NANO --scenario pp --era Run3 --no_exec --mc || exit $? ;
 
 echo "================= CMSRUN finished ====================" | tee -a job.log
-mv 4_HIG-Run3Summer22EENanoAODv12.root ntuple_$JOBNUM.root

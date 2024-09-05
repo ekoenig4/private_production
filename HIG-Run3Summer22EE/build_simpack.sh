@@ -30,15 +30,15 @@ config.General.transferOutputs = True
 config.General.transferLogs    = False
 
 config.Data.splitting   = 'EventBased'
-config.Data.unitsPerJob = 10
-config.Data.totalUnits  = 50
+config.Data.unitsPerJob = 500
+config.Data.totalUnits  = 100*500
 config.Data.outLFNDirBase = '/store/user/ekoenig/private_production/HIG-Run3Summer22EE/'
 config.Data.publication = False
 config.Data.outputDatasetTag     = '${SIMPACK}'
 
 config.JobType.pluginName  = 'PrivateMC'
 config.JobType.psetName    = 'nanoAOD_cfi.py'
-config.JobType.maxMemoryMB = 2500
+config.JobType.maxMemoryMB = 3500
 config.JobType.inputFiles  = ['scriptExe.sh', 'Configuration', 'gridpack.tar.xz']
 config.JobType.scriptExe   ='scriptExe.sh'
 config.JobType.scriptArgs  = [ 'events='+str(config.Data.unitsPerJob) ]

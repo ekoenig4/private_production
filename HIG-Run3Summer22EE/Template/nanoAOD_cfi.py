@@ -77,7 +77,7 @@ process.NANOAODSIMoutput = cms.OutputModule("NanoAODOutputModule",
         dataTier = cms.untracked.string('NANOAODSIM'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('file:4_HIG-Run3Summer22EENanoAODv12.root'),
+    fileName = cms.untracked.string('file:ntuple.root'),
     outputCommands = process.NANOAODSIMEventContent.outputCommands
 )
 
