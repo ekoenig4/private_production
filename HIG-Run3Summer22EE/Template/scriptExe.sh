@@ -12,16 +12,22 @@ if [ -z $EVENTS ]; then
     echo "Using default number of events: $EVENTS"
 fi
 
+TYPE="${3#type=}"
+if [ -z $TYPE ]; then
+    TYPE=madgraph
+    echo "Using default type: $TYPE"
+fi
+
 BASE=$PWD
 SEED=$(($(date +%s) % 100 + $JOBNUM))
 
-echo "================= CMSRUN starting jobNum=$1 ====================" | tee -a job.log
+echo "================= CMSRUN starting jobNum=$1 ===================="
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 build_cmssw() {
     VERSION=$1
 
-    echo "================= CMSRUN setting up CMSSW_$VERSION ===================="| tee -a job.log
+    echo "================= CMSRUN setting up CMSSW_$VERSION ===================="
     if [ -r CMSSW_$VERSION/src ] ; then 
     echo release CMSSW_$VERSION already exists
     
@@ -53,17 +59,17 @@ run() {
 
     export ARGS=$@
 
-    echo "================= CMSRUN setting up $SCRIPT step ====================" | tee -a job.log
+    echo "================= CMSRUN setting up $SCRIPT step ===================="
 
     cmsDriver.py $ARGS --python_filename $SCRIPT.py -n $EVENTS || exit $? ;
 
-    echo "================= CMSRUN starting $SCRIPT step ====================" | tee -a job.log
+    echo "================= CMSRUN starting $SCRIPT step ===================="
 
     cmsRun -e -j $REPORT_NAME $SCRIPT.py
     status=$?
 
     if [ $status -ne 0 ]; then
-        echo "================= CMSRUN error with exit status $status ====================" | tee -a job.log
+        echo "================= CMSRUN error with exit status $status ===================="
         rm -f *.root
         exit $status
     fi
@@ -73,7 +79,7 @@ run() {
 export SCRAM_ARCH=el8_amd64_gcc10
 build_cmssw 12_4_14_patch3
 run 0_HIG-Run3Summer22EEwmLHEGS \
-    Configuration/GenProduction/python/HIG-Run3Summer22EEwmLHEGS-00282-fragment.py \
+    Configuration/GenProduction/python/HIG-Run3Summer22EEwmLHEGS-00282-fragment_${TYPE}.py \
     --fileout "file:0_HIG-Run3Summer22EEwmLHEGS.root" \
     --eventcontent RAWSIM,LHE --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM,LHE --conditions 124X_mcRun3_2022_realistic_postEE_v1 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})"\\nprocess.source.firstLuminosityBlock="cms.untracked.uint32(${JOBNUM})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${EVENTS})" --step LHE,GEN,SIM --geometry DB:Extended --era Run3 --no_exec --mc || exit $? ;
 
@@ -106,4 +112,4 @@ run 4_HIG-Run3Summer22EENanoAODv12 \
     --fileout "file:ntuple.root" \
     --eventcontent NANOAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier NANOAODSIM --conditions 130X_mcRun3_2022_realistic_postEE_v6 --step NANO --scenario pp --era Run3 --no_exec --mc || exit $? ;
 
-echo "================= CMSRUN finished ====================" | tee -a job.log
+echo "================= CMSRUN finished ===================="

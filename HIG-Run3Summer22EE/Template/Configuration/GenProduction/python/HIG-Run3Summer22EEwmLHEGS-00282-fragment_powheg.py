@@ -31,7 +31,7 @@ generator = cms.EDFilter(
         pythia8PSweightsSettingsBlock,
         pythia8PowhegEmissionVetoSettingsBlock,
         processParameters = cms.vstring(
-            'POWHEG:nFinal = 2',   ## Number of final state particles
+            'POWHEG:nFinal = 3',   ## Number of final state particles
                                    ## (BEFORE THE DECAYS) in the LHE
                                    ## other than emitted extra parton
              '25:m0 = 125.0',
