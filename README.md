@@ -42,6 +42,9 @@ config.JobType.maxMemoryMB = 3500
 config.Site.storageSite = 'T3_CH_CERNBOX'
 ```
 
+### Editting existing `simpacks`
+If you want to submit an existing simpack you can directly edit the `crabConfig.py` file in the directory
+
 ### Submitting to CRAB
 You will need to setup the CMSSW environment for the final stage of production as well as source the proper crab environment.
 There is a provided script which does this all for you, `submit_crab.sh`. 
