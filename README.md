@@ -1,4 +1,6 @@
-# Run3 Private Production
+# Run3 private sample production
+
+In development, README will be extensively updated later.
 
 ## Creating NanoAOD locally
 
