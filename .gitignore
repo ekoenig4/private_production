@@ -1,4 +1,2 @@
-test/
-simulation/
-gridpacks/
-runcmsgrid/
+# ignore simpacks
+run/simpacks

@@ -12,12 +12,6 @@ if [ -z $EVENTS ]; then
     echo "Using default number of events: $EVENTS"
 fi
 
-TYPE="${3#type=}"
-if [ -z $TYPE ]; then
-    TYPE=madgraph
-    echo "Using default type: $TYPE"
-fi
-
 BASE=$PWD
 SEED=$(($(date +%s) % 100 + $JOBNUM))
 
@@ -79,7 +73,7 @@ run() {
 export SCRAM_ARCH=el8_amd64_gcc10
 build_cmssw 12_4_14_patch3
 run 0_HIG-Run3Summer22EEwmLHEGS \
-    Configuration/GenProduction/python/HIG-Run3Summer22EEwmLHEGS-00282-fragment_${TYPE}.py \
+    Configuration/GenProduction/python/fragment.py \
     --fileout "file:0_HIG-Run3Summer22EEwmLHEGS.root" \
     --eventcontent RAWSIM,LHE --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM,LHE --conditions 124X_mcRun3_2022_realistic_postEE_v1 --beamspot Realistic25ns13p6TeVEarly2022Collision --customise_commands process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})"\\nprocess.source.firstLuminosityBlock="cms.untracked.uint32(${JOBNUM})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${EVENTS})" --step LHE,GEN,SIM --geometry DB:Extended --era Run3 --no_exec --mc || exit $? ;
 
