@@ -19,8 +19,6 @@ if __name__=='__main__':
       help='Path to generator fragment')
     parser.add_argument('-c', '--conditions', required=True, type=os.path.abspath,
       help='Path to folder with conditions (must contain "nanoaod_cfi.py" and "nanoaod_run.sh")')
-    parser.add_argument('-t', '--type', default='madgraph', choices=['madgraph', 'powheg'],
-      help='Type of gridpack (choose from "powheg" or "madgraph") (default: "madgraph")')
     parser.add_argument('--container', default=None,
       help='Container to use (default: None)')
     parser.add_argument('-n', '--name', default=None,
@@ -99,6 +97,9 @@ if __name__=='__main__':
     # copy the condition dependent configuration and exe to the simpack
     print('Copyting condition dependent config and exe...')
     os.system('cp -rv {} {}'.format(os.path.join(args.conditions,'*'), simpack))
+
+    # make sure the nanoaod_run script is executable
+    os.system('chmod +x {}'.format(os.path.join(simpack, 'nanoaod_run.sh')))
 
     # patch the run_in_container script
     containerscript = os.path.join(simpack, 'run_in_container.sh')
