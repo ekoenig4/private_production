@@ -48,7 +48,7 @@ if __name__=='__main__':
     if not os.path.exists(args.conditions):
         msg = 'Provided conditions folder {} does not exist.'.format(args.conditions)
         raise Exception(msg)
-    required_condition_files = ['nanoaod_cfi.py', 'nanoaod_run.sh']
+    required_condition_files = ['nanoaod_run.sh']
     for f in required_condition_files:
         if not os.path.exists(os.path.join(args.conditions, f)):
             msg = 'Provided conditions folder does not contain the required file {}.'.format(f)
@@ -94,8 +94,8 @@ if __name__=='__main__':
     print('Copying generator fragment...')
     os.system('cp -v {} {}'.format(args.fragment, newfragment))
 
-    # copy the condition dependent configuration and exe to the simpack
-    print('Copyting condition dependent config and exe...')
+    # copy the condition dependent exe to the simpack
+    print('Copyting condition dependent exe...')
     os.system('cp -rv {} {}'.format(os.path.join(args.conditions,'*'), simpack))
 
     # make sure the nanoaod_run script is executable

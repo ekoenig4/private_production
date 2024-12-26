@@ -5,7 +5,7 @@ config = config()
 # set the CRAB working directory (where log files will appear)
 config.General.workArea        = 'crab_logs'
 # set the folder within the CRAB working directory for a specific submission
-config.General.requestName     = 'private_sample'
+config.General.requestName     = 'test_sample'
 config.General.transferOutputs = True
 config.General.transferLogs    = False
 
@@ -25,12 +25,19 @@ config.Data.publication = False
 # set the name of the sample
 config.Data.outputDatasetTag = 'test_sample'
 
+# set the plugin name (do not change, only 'privateMC' is allowed for this type of job)
 config.JobType.pluginName  = 'PrivateMC'
-config.JobType.psetName    = 'nanoaod_cfi.py'
+# set the parameter set file (do not change, it is only a dummy, formally needed by CRAB)
+config.JobType.psetName    = 'pset.py'
+# set the requested memory limit
 config.JobType.maxMemoryMB = 3500
+# set the auxiliary files and folders that should be copied to the worker node
 config.JobType.inputFiles  = ['run_in_container.sh', 'nanoaod_run.sh', 'Configuration', 'gridpack.tar.xz']
+# set the actual executabe that will be run
+# (note: this overrides the default 'cmsRun pset.py')
 config.JobType.scriptExe   = 'run_in_container.sh'
 config.JobType.scriptArgs  = [ 'events='+str(config.Data.unitsPerJob) ]
+# set the number of requested cores
 config.JobType.numCores    = 1
 
 # set the storage site
