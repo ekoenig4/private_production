@@ -18,7 +18,7 @@ if __name__=='__main__':
     parser.add_argument('-f', '--fragment', required=True, type=os.path.abspath,
       help='Path to generator fragment')
     parser.add_argument('-c', '--conditions', required=True, type=os.path.abspath,
-      help='Path to folder with conditions (must contain "nanoaod_cfi.py" and "nanoaod_run.sh")')
+      help='Path to folder with conditions (must contain "nanoaod_run.sh")')
     parser.add_argument('--container', default=None,
       help='Container to use (default: None)')
     parser.add_argument('-n', '--name', default=None,
