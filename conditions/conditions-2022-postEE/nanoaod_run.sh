@@ -29,27 +29,21 @@ build_cmssw() {
     VERSION=$1
 
     echo "================= CMSRUN setting up CMSSW_$VERSION ===================="
-    if [ -r CMSSW_$VERSION/src ] ; then 
+    if [ -r CMSSW_$VERSION/src ] ; then
       echo release CMSSW_$VERSION already exists
-    
-      cd CMSSW_$VERSION/src
-      eval `scram runtime -sh`
-
-      cd $BASE
-    
     else
       scram p CMSSW CMSSW_$VERSION
-
-      if [ ! -f CMSSW_$VERSION/src/Configuration ]; then
-          cp -r Configuration CMSSW_$VERSION/src
-      fi
-    
-      cd CMSSW_$VERSION/src
-      eval `scram runtime -sh`
-      scram b
-
-      cd $BASE
     fi
+
+    if [ ! -f CMSSW_$VERSION/src/Configuration ]; then
+        cp -r Configuration CMSSW_$VERSION/src
+    fi
+
+    cd CMSSW_$VERSION/src
+    eval `scram runtime -sh`
+    scram b
+
+    cd $BASE
 }
 
 run() {

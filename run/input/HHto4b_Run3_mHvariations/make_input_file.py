@@ -22,7 +22,7 @@ if __name__=='__main__':
             gridpack += 'ggHH_slc7_amd64_gcc700_CMSSW_10_6_8_workdir_powheg_ggHH_SM_m_{}.tgz'.format(mass)
             fragment = os.path.abspath('../../../genfragments/HHto4b_powheg')
             fragment = os.path.join(fragment, 'HHto4b_mH_{}_powheg.py'.format(mass))
-            conditions = os.path.abspath('../../../conditions-{}'.format(year))
+            conditions = os.path.abspath('../../../conditions/conditions-{}'.format(year))
             # make sample name
             name = 'HHto4b_mH_{}_powheg_pythia8_Run3_{}'.format(mass, year)
             line = ' '.join([name, gridpack, fragment, conditions])
