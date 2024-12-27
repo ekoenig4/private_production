@@ -3,3 +3,6 @@ run/simpacks
 
 # ignore input listings
 run/input/**/*.txt
+
+# ignore proxy
+**x509up_*
