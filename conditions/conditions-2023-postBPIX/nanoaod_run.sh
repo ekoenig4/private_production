@@ -125,7 +125,6 @@ run 2_HIG-Run3Summer23BPixAOD \
     --datatier AODSIM \
     --conditions 130X_mcRun3_2023_realistic_postBPix_v2 \
     --step RAW2DIGI,L1Reco,RECO,RECOSIM \
-    --procModifiers siPixelQualityRawToDigi \
     --geometry DB:Extended \
     --era Run3_2023 \
     --no_exec \
