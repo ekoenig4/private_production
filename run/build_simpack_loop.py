@@ -32,6 +32,19 @@ if __name__=='__main__':
     print('Running build_simpack_loop.py with following configuration:')
     for arg in vars(args): print('  - {}: {}'.format(arg, getattr(args,arg)))
 
+    # handle case where simpacks were already built, now just submit
+    if os.path.isdir(args.inputfile):
+        # find simpacks in provided directory
+        simpacks = [os.path.join(args.inputfile, simpack) for simpack in os.listdir(args.inputfile)]
+        msg = 'Submit {} simpacks in {}? (y/n)'.format(len(simpacks), args.inputfile)
+        print(msg)
+        go = six.moves.input()
+        if go != 'y': sys.exit()
+        for simpack in simpacks:
+            cmd = 'cd {}; ./crab_submit.sh'.format(simpack)
+            os.system(cmd)
+        sys.exit()
+
     # read input file
     with open(args.inputfile, 'r') as f: lines = f.readlines()
     simpacks = []

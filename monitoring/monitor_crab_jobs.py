@@ -311,7 +311,7 @@ if __name__ == '__main__':
             msg += 'for sample {}.'.format(f)
             raise Exception(msg)
         cmd = 'cd {}'.format(workdir)
-        cmd += '; bash crab_command.sh status {} >> {}'.format(f, tmpfile)
+        cmd += '; bash crab_command.sh status {} > {}'.format(f, tmpfile)
         cmds.append(cmd)
 
     # initialize all samples to 0% finished and empty grafana link
@@ -397,7 +397,10 @@ if __name__ == '__main__':
         # handle case where job is complete
         if statuscompleted:
             print('This task is completed...')
-                  
+    
+    # delete log file if it somehow still exists
+    if os.path.exists(tmpfile): os.system('rm {}'.format(tmpfile))
+
     # make web interface for gathered completion data              
     os.chdir(wdir)
     print('Loop over all samples completed.')
