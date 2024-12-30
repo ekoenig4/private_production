@@ -104,7 +104,7 @@ run 1_HIG-Run3Summer22EEDRPremix \
     --eventcontent PREMIXRAW \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier GEN-SIM-RAW \
-    --pileup_input "dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX" \
+    --pileup_input "dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer22_124X_mcRun3_2022_realistic_v11-v2/PREMIX#13ee937a-b4ef-4844-829f-8d217be6cf70" \
     --conditions 124X_mcRun3_2022_realistic_postEE_v1 \
     --step DIGI,DATAMIX,L1,DIGI2RAW,HLT:2022v14 \
     --procModifiers premix_stage2,siPixelQualityRawToDigi \
