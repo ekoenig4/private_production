@@ -9,3 +9,6 @@ run/input/**/*.txt
 
 # ignore proxy
 **x509up_*
+
+# ignore monitoring output
+monitoring/monitor_crab_jobs
