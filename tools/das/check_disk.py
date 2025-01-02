@@ -26,6 +26,12 @@ if __name__=='__main__':
     parser.add_argument('-p', '--proxy', default=None, type=os.path.abspath,
       help='Set path to proxy (might be needed in condor submission mode;'
           +' first copy your proxy  to somewhere else than /tmp)')
+    parser.add_argument('--shortcut', default=False, action='store_true',
+      help='Use shortcut by checking disk availability per block,'
+          +' but write out individual files for available blocks.'
+          +' This assumes that file presence is managed per-block,'
+          +' which seems to be the case for a few examples, but is not guaranteed.'
+          +' Note that this argument overrides the --level argument.')
     args = parser.parse_args()
 
     # handle condor submission
@@ -36,8 +42,12 @@ if __name__=='__main__':
         if args.number > 0: cmd += ' -n {}'.format(args.number)
         if args.outputfile is not None: cmd += ' -o {}'.format(args.outputfile)
         cmd += ' -r local'
+        if args.shortcut: cmd += ' --shortcut'
         ct.submitCommandAsCondorJob('cjob_check_disk', cmd, proxy=args.proxy, jobflavour='workday')
         sys.exit()
+
+    # handle shortcut case
+    if args.shortcut: args.level = 'block'
 
     # find files (or blocks) in dataset
     dasquery = '{} dataset={}'.format(args.level, args.dataset)
@@ -58,13 +68,13 @@ if __name__=='__main__':
     # loop over files
     files_to_sites = {}
     for fileidx, file in enumerate(files):
-        print('Now processing {} {}/{}...'.format(args.level, fileidx+1, len(files)), end='\r')
-        if (fileidx+1)%10==0: sys.stdout.flush()
 
-        # write progress to log file
-        if (fileidx+1)%100==0:
-            with open(logfile,'a') as f:
-                f.write('Progress: {}/{}\n'.format(fileidx+1, len(files)))
+        # write progress to screen and to a log file
+        step = 10 if args.level == 'block' else 100
+        if fileidx < 10 or (fileidx+1) % step == 0:
+            msg = 'Finding sites for {} {}/{}...'.format(args.level, fileidx+1, len(files))
+            print(msg, end='\r')
+            with open(logfile,'a') as f: f.write(msg + '\n')
 
         # find sites for file
         dasquery = 'site {}={}'.format(args.level, file)
@@ -94,6 +104,28 @@ if __name__=='__main__':
     print('Printing first {}:'.format(nprint))
     print(files_on_disk[:nprint])
 
+    # handle shortcut case
+    if args.shortcut:
+        blocks_on_disk = files_on_disk[:]
+        files_on_disk = []
+
+        # loop over blocks
+        for blockidx, block in enumerate(blocks_on_disk):
+            
+            # write progress to screen and to a log file
+            if blockidx < 10 or (blockidx+1) % step == 0:
+                msg = 'Finding files in block {}/{}...'.format(blockidx+1, len(blocks_on_disk))
+                print(msg, end='\r')
+                with open(logfile,'a') as f: f.write(msg + '\n')
+
+            # find files in block
+            dasquery = 'file block={}'.format(block)
+            files = das_client.get_data(dasquery)
+            if files['status'] != 'ok': raise Exception(str(files))
+            files = files['data']
+            files = [el['file'][0]['name'] for el in files]
+            files_on_disk += files
+
     # write output file
     if args.outputfile is not None:
         with open(args.outputfile, 'w') as f:
@@ -102,4 +134,4 @@ if __name__=='__main__':
         print('Output written to {}'.format(args.outputfile))
 
     # delete temporary log file
-    os.system('rm {}'.format(logfile))
+    if os.path.exists(logfile): os.system('rm {}'.format(logfile))
