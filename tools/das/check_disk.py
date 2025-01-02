@@ -36,9 +36,6 @@ if __name__=='__main__':
         if args.number > 0: cmd += ' -n {}'.format(args.number)
         if args.outputfile is not None: cmd += ' -o {}'.format(args.outputfile)
         cmd += ' -r local'
-        # add output redirector to log file
-        logfile = 'cjob_log_' + os.path.splitext(os.path.basename(args.outputfile))[0] + '.txt'
-        cmd += ' > {} 2>&1'.format(logfile)
         ct.submitCommandAsCondorJob('cjob_check_disk', cmd, proxy=args.proxy, jobflavour='workday')
         sys.exit()
 
@@ -54,12 +51,20 @@ if __name__=='__main__':
     if args.number > 0 and args.number < len(files):
         files = files[:args.number]
         print('Limiting number of {}s to {}.'.format(args.level, args.number))
-    
+
+    # define log file for writing progress
+    logfile = 'log_' + os.path.splitext(os.path.basename(args.outputfile))[0] + '.txt'
+
     # loop over files
     files_to_sites = {}
     for fileidx, file in enumerate(files):
         print('Now processing {} {}/{}...'.format(args.level, fileidx+1, len(files)), end='\r')
         if (fileidx+1)%10==0: sys.stdout.flush()
+
+        # write progress to log file
+        if (fileidx+1)%100==0:
+            with open(logfile,'a') as f:
+                f.write('Progress: {}/{}\n'.format(fileidx+1, len(files)))
 
         # find sites for file
         dasquery = 'site {}={}'.format(args.level, file)
@@ -95,3 +100,6 @@ if __name__=='__main__':
             for file_on_disk in files_on_disk:
                 f.write(file_on_disk + '\n')
         print('Output written to {}'.format(args.outputfile))
+
+    # delete temporary log file
+    os.system('rm {}'.format(logfile))
