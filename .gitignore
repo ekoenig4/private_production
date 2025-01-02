@@ -12,3 +12,6 @@ run/input/**/*.txt
 
 # ignore monitoring output
 monitoring/monitor_crab_jobs
+
+# ignore condor temporary files
+**cjob_*
