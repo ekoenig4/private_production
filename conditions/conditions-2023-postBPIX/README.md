@@ -8,3 +8,5 @@ Customizations:
 - Monitoring in the form of `--customise Configuration/DataProcessing/Utils.addMonitoring` was added to every step.
 - The random number seed is set as follows (in the LHE/GEN-SIM step): `--customise_commands process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})"\\nprocess.source.firstLuminosityBlock="cms.untracked.uint32(${JOBNUM})"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(${EVENTS})"`
 
+The `--pileup_input` argument was modified because of an issue with deleted files,
+see main README for more info.

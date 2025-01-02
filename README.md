@@ -8,6 +8,7 @@ but should be generalizable to any other sample as long as the correct gridpack,
 ## References
 - This repo was originally forked from the [private production repo by Evan Koenig](https://github.com/ekoenig4/private_production).
 - The appropriate processing sequences can be retrieved from here [this PdmV TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun3Analysis) (for early Run-3, presumably similar pages exist for other data-taking eras).
+- A more 'official' repo with similar functionality appears to exist [here](https://gitlab.cern.ch/shjeon/sample_factory). Still to look into it.
 
 ## Prerequisites
 
@@ -96,6 +97,44 @@ Run `python3 merge.py -h` to see the command line arguments.
 Note that you need to source a relatively recent CMSSW version, as this is required for the `haddnano.py` script to be available.
 For example, `CMSSW_14_0_0` seems to work (on a default `lxplus` architecture).
 Simply install it somewhere using `cmsrel CMSSW_14_0_0` and provide the path to this CMSSW folder with the `--cmssw` argument to `merge.py` (both for local running as for condor job submission).
+
+
+## Various notes
+
+### Premixing settings for pileup
+The dataset from which premixed pileup events are to be taken must be specified in the conditions,
+more specifically in the `cmsDriver` command corresponding to the premixing step.
+The easiest way is to use an argument of the form `--pileup_input "dbs:<name of appropriate dataset on DAS>"`,
+where the 'appropriate dataset' for the data-taking period of interest should be retrieved from the instructions (if any can be found),
+or from an expert.
+See [here](https://github.com/LukaLambrecht/private-sample-production/blob/39a16304e6cf9e872b7fba00bcc94789a9a9875f/conditions-2022-preEE/nanoaod_run.sh#L113) for an example.
+
+This simple approach might make a significant fraction of CRAB jobs crash however,
+as apparently the 'appropriate datasets' were partly deleted to save disk space.
+It is not clear which data-taking periods exactly are affected, but probably all.
+Somehow the deleted files still show up in the DAS query (inside the CRAB job),
+so that CRAB finds and tries to open a premixed file that turns out not to exist...
+For a discussion of this issue, see [this CMS Talk thread](https://cms-talk.web.cern.ch/t/missing-files-for-digipremix-step-runiisummer20ul17-private-production/80581/3),
+and an example of a crash caused by this issue is discussed [here](https://cms-talk.web.cern.ch/t/crab-jobs-failing-on-opening-premixing-files/88103/3).
+
+As a solution, one can either keep resubmitting until a satisfactory completion percentage is reached.
+This works since CRAB chooses a premixed file at random (?) with every resubmission,
+so a fraction of the jobs will succeed because their file turns out to exist.
+This might require a large number of resubmissions however, and wastes a lot of resources.
+
+Another solution consists of making a list of all files in a premixed dataset that are actually on disk,
+and providing that list to `cmsDriver`.
+The list of files should be stored in a simple `.txt` file with one file per line.
+A tool for making theses lists for datasets of your choice is provided in `tools/das/check_disk.py`.
+Once the list is made, perform the following steps to use it:
+- The file name should be passed to `cmsDriver` (in `nanoaod_run.sh`) as follows: `--pileup_input filelist:<name of your txt file>`.
+- Make sure this file is present in the simpack.
+This can be achieved by adding it in the appropriate conditions folder
+(as all files in this folder are automatically copied to the simpack by `build_simpack.py`).
+- Make sure the file is transfered to the CRAB sandbox.
+This should be handled automatically as long as the file ends in `.txt`
+(because of the `*.txt` specification in the `inputFiles` setting in the `crab_config.py` file).
+Else, add it manually in the `inputFiles` setting in the `crab_config.py` file.
 
 
 ## Internal notes for HH -> 4b sample generation

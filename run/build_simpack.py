@@ -95,6 +95,7 @@ if __name__=='__main__':
     os.system('cp -v {} {}'.format(args.fragment, newfragment))
 
     # copy the condition dependent exe to the simpack
+    # (and potentially auxiliary files such as a list of pileup premixed files on disk)
     print('Copyting condition dependent exe...')
     os.system('cp -rv {} {}'.format(os.path.join(args.conditions,'*'), simpack))
 

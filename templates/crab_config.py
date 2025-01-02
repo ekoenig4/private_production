@@ -31,8 +31,9 @@ config.JobType.pluginName  = 'PrivateMC'
 config.JobType.psetName    = 'pset.py'
 # set the requested memory limit
 config.JobType.maxMemoryMB = 3500
-# set the auxiliary files and folders that should be copied to the worker node
-config.JobType.inputFiles  = ['run_in_container.sh', 'nanoaod_run.sh', 'Configuration', 'gridpack.tar.xz']
+# set the auxiliary files and folders that should be copied to the worker node.
+# note: the *.txt can hold any auxiliary files in txt format present in the simpack.
+config.JobType.inputFiles  = ['run_in_container.sh', 'nanoaod_run.sh', 'Configuration', 'gridpack.tar.xz', '*.txt']
 # set the actual executabe that will be run
 # (note: this overrides the default 'cmsRun pset.py')
 config.JobType.scriptExe   = 'run_in_container.sh'

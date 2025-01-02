@@ -131,6 +131,11 @@ if __name__=='__main__':
         with open(args.outputfile, 'w') as f:
             for file_on_disk in files_on_disk:
                 f.write(file_on_disk + '\n')
+        # post-processing
+        tmpfile = os.path.splitext(os.path.basename(args.outputfile))[0] + '_tmp.txt'
+        os.system('sort {} > {}'.format(args.outputfile, tmpfile))
+        os.system('uniq {} > {}'.format(tmpfile, args.outputfile))
+        os.system('rm {}'.format(tmpfile))
         print('Output written to {}'.format(args.outputfile))
 
     # delete temporary log file

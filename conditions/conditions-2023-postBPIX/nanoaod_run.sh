@@ -104,7 +104,7 @@ run 1_HIG-Run3Summer23BPixDRPremix \
     --eventcontent PREMIXRAW \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier GEN-SIM-RAW \
-    --pileup_input "dbs:/Neutrino_E-10_gun/Run3Summer21PrePremix-Summer23BPix_130X_mcRun3_2023_realistic_postBPix_v1-v1/PREMIX#3cfdd519-2519-4450-9354-33fff5d6790a" \
+    --pileup_input "filelist:pileup_files_on_disk.txt" \
     --conditions 130X_mcRun3_2023_realistic_postBPix_v2 \
     --step DIGI,DATAMIX,L1,DIGI2RAW,HLT:2023v12 \
     --procModifiers premix_stage2 \
