@@ -233,9 +233,14 @@ if __name__ == '__main__':
     # read command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--simpackdir', required=True, type=os.path.abspath,
-      help='Simpack directory')
+      help='Directory containing one or more simpacks to monitor')
     parser.add_argument('-r', '--resubmit', default=False, action='store_true',
       help='Do resubmission of failed jobs (default: False, only monitor)')
+    parser.add_argument('--resubmit_args', default=None,
+      help='Command line args passed to the crab resubmit command.'
+          +' Enclose in single quotes, e.g. --resubmit_args \'--siteblacklist=T2_BE_IIHE'
+          +' --maxmemory 3000\'.'
+          +' See https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3Commands#crab_resubmit.')
     parser.add_argument('-p', '--proxy', default=None, type=os.path.abspath,
       help='Path to your proxy (default: do not export proxy explicitly)')
     parser.add_argument('-t', '--test', default=False, action='store_true',
@@ -297,22 +302,21 @@ if __name__ == '__main__':
              +' {} out of {} samples'.format(ntest, nfproc))
         fproc = fproc[:ntest]
 
-    # find the crab_command script for each sample
+    # find the crab_command.sh script for each sample
     # (note: cannot use standard 'crab status' command since a special container is needed)
     # (note: absolute path does not work, script must be run from inside its directory)
-    cmds = []
+    workdirs = []
+    crab_command_script = 'crab_command.sh'
     thisdir = os.path.abspath(os.path.dirname(__file__))
     tmpfile = os.path.join(thisdir, 'monitor_tmp_log.txt')
     for fidx, f in enumerate(fproc):
         workdir = f.split('/crab_logs/')[0]
-        exe = os.path.join(workdir, 'crab_command.sh')
+        exe = os.path.join(workdir, crab_command_script)
         if not os.path.exists(exe):
-            msg = 'Could not find crab_command.sh script at location {}'.format(exe)
+            msg = 'Could not find {} script in {}'.format(crab_command_script, workdir)
             msg += 'for sample {}.'.format(f)
             raise Exception(msg)
-        cmd = 'cd {}'.format(workdir)
-        cmd += '; bash crab_command.sh status {} > {}'.format(f, tmpfile)
-        cmds.append(cmd)
+        workdirs.append(workdir)
 
     # initialize all samples to 0% finished and empty grafana link
     for fidx, f in enumerate(fproc):
@@ -326,8 +330,9 @@ if __name__ == '__main__':
         # delete previously existing log file
         if os.path.exists(tmpfile): os.system('rm {}'.format(tmpfile))
 
-        # get appropriate command to execute
-        status_cmd = cmds[fidx]
+        # make crab status command
+        status_cmd = 'cd {}'.format(workdirs[fidx])
+        status_cmd += '; bash {} status {} > {}'.format(crab_command_script, f, tmpfile)
  
         # run crab status command and write the output to a log file
         success = False
@@ -390,7 +395,12 @@ if __name__ == '__main__':
         if jobsfailed:
             if args.resubmit:
                 print('Found failed jobs, now resubmitting...')
-                resubmit_cmd = status_cmd.replace('crab_status.sh', 'crab_command.sh resubmit')
+                # make crab resubmit command
+                resubmit_cmd = 'cd {}'.format(workdirs[fidx])
+                resubmit_cmd += '; bash {} resubmit'.format(crab_command_script)
+                if args.resubmit_args is not None: resubmit_cmd += ' {}'.format(args.resubmit_args)
+                resubmit_cmd += ' {}'.format(f)
+                print('Resubmit command: {}'.format(resubmit_cmd))
                 os.system(resubmit_cmd)
                 print('Done')
         
