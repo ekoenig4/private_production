@@ -13,17 +13,18 @@ but should be generalizable to any other sample as long as the correct gridpack,
 ## Prerequisites
 
 **Gridpack:** The sample generation needs a gridpack (i.e. a compiled standalone version of a matrix element event generator) to start from.
-How to generate a gridpack depends on the process and generator of interest, and it is best to consult an expert (which I am not).
-For the original use case of this repository (double H-boson production with the Powheg generator), see [this related repo](https://github.com/LukaLambrecht/HH-gridpack-generation) with instructions.
+How to generate a gridpack depends on the process and generator of interest, and if you don't have instructions or an example to start from, it is best to consult an expert.
+For the original use case of this repository (double H boson production with the Powheg generator), see [this related repo](https://github.com/LukaLambrecht/HH-gridpack-generation) with instructions.
 
 **Generator fragment:** The second ingredient is an appropriate generator fragment (i.e. a config file dealing mostly with the settings for the decays, parton shower, and/or hadronization).
 Again it is best to consult an expert on the correct fragment to use.
-For the original use case of this repository (double H-boson production interfaced with Pythia8 for decays to b-quarks), see the [genfragments/HHto4b_powheg](https://github.com/LukaLambrecht/private-sample-production/tree/main/genfragments/HHto4b_powheg) folder for examples.
+For the original use case of this repository (double H boson production interfaced with Pythia8 for decays to b-quarks), see the [genfragments/HHto4b_powheg](https://github.com/LukaLambrecht/private-sample-production/tree/main/genfragments/HHto4b_powheg) folder for examples.
 
 **Processing sequence with correct conditions:** The final ingredient is a sequence of `cmsDriver` and `cmsRun` commands that define the whole processing from gridpack to LHE, GEN-SIM, PREMIX, AOD, MiniAOD and finally NanoAOD.
 This sequence is dependent on the data-taking conditions, and should be meticulously followed without any alteration if you want to avoid strange and completely uninformative crashes.
-The appropriate processing sequences can be retrieved from here [this PdmV TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun3Analysis) (for early Run-3, presumably similar pages exist for other data-taking eras).
-Examples scripts are provided in the [conditions](ttps://github.com/LukaLambrecht/private-sample-production/tree/main/conditions) folder.
+The appropriate processing sequences can be retrieved from here [this PdmV TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun3Analysis).
+This page is for early Run-3, presumably similar pages exist for other data-taking eras; if not, consult an expert.
+Examples are provided in the [conditions](ttps://github.com/LukaLambrecht/private-sample-production/tree/main/conditions) folder.
 Currently there are scripts for 2022 (preEE and postEE) and 2023 (preBPIX and postBPIX), perhaps to extend later.
 
 **This repository:** Download this repo as follows:
@@ -39,12 +40,17 @@ Some modification might be needed on other systems, depending on the architectur
 A simpack is a folder containing the gridpack, generator fragment, processing script, and any other files that might be needed.
 It is a standalone entity that can be shipped to CRAB for sample generation.
 
-Go inside the `run` directory and run `python3 build_simpack.py`.
+Go inside the [run](https://github.com/LukaLambrecht/private-sample-production/tree/main/run) directory and run `python3 build_simpack.py`.
 Use the argument `-h` to see a list of all available command line options with a brief explanation.
 The most important ones are:
 - `-g`: provide the path to the gridack to start event generation from.
 - `-f`: provide the path to an appropriate generator fragment.
-- `-c`: provide the path to the folder containing the condition-dependent processing sequence. Typically this would be of the form `-c ../conditions/conditions-<era>`. Do not provide the full path to the `nanoaod_run.sh` file, only to the folder that contains it.
+- `-c`: provide the path to the folder containing the condition-dependent processing sequence and potential auxiliary files.
+Typically this path would be of the form `-c ../conditions/conditions-<era>`.
+The provided directory must contain a `nanoaod_run.sh` script containing the sequence to execute,
+but do not provide the full path to the `nanoaod_run.sh` file, only to the folder that contains it.
+Any other files present in this directory will be copied to the simpack as well.
+A notable example of these potential auxiliary files is lists of files with premixed pileup events that are available on disk (see below for a full discussion).
 - `--container`: for some CMSSW versions (as defined in the processing sequence), a container is needed.
 Not yet sure which container exactly is needed for which CMSSW version, but for now just use `--container cmssw-el8`, which seems to work for the currently implemented conditions.
 - `-s`: storage site.
@@ -61,6 +67,19 @@ The simpack will be created under `run/simpacks/<name of the simpack>`.
 Before submitting it, it is a good idea to go inside the simpack and check if everyting looks ok
 (e.g. the correct fragment, correct processing sequence in `nanoaod_run.sh`, correct CRAB parammeters in `crab_config.py`, etc.).
 
+### Make a range of simpacks in one go
+In case you need to submit a range of simpacks (e.g. similar samples with mass variations and for multiple data-taking eras),
+this can be done more conveniently using the `build_simpack_loop.py` script (also in the [run](https://github.com/LukaLambrecht/private-sample-production/tree/main/run) directory).
+The main input to this script consists of a simple `.txt` file, in which each line has the following structure `<sample name> <path to gridpack> <path to generator fragment> <path to conditions folder>`
+(where the different parts are separated by spaces).
+The script [run/input/HHto4b_Run3_mHvariations/make_input_file.py](https://github.com/LukaLambrecht/private-sample-production/blob/main/run/input/HHto4b_Run3_mHvariations/make_input_file.py) contains an example of making such a file, but must be adapted to each use case.
+The other arguments to `build_simpack_loop.py` are similar to `build_simpack.py`.
+Run with the `-h` option for more info.
+
+Note: running `python3 build_simpack_loop.py` with the appropriate arguments will first build all the simpacks, and then ask for confirmation to submit all of them.
+In case you skipped the submission, you can do that later without needing to rebuild all the simpacks by running `python3 build_simpack_loop.py -i <folder with simpacks>`
+(i.e. by using a folder with simpacks instead of the `.txt` input file).
+
 ## Submit the simpack and monitor the progress
 After checking that all looks good, submit the simpack simply by going inside and running `./crab_submit.sh`.
 Note that you need a valid proxy for this step.
@@ -69,7 +88,9 @@ You can make one with `voms-proxy-init --voms cms`.
 The status of the CRAB jobs of a particular simpack can be assessed by going inside the simpack and running `./crab_command.sh status crab_logs/<simpack name>`.
 You can add the argument `--verboseErrors` for more detailed error reporting, or click the Grafana link for a full overview.
 
-To streamline this approach in case of many simpacks, a utility script `monitor_crab_jobs.py` (inside the `monitoring` folder) is provided that runs the `./crab_command.sh status` script on multiple crab working directories and makes an overview of the results. 
+Note: the script `./crab_commnd.sh status` just runs the builtin CRAB command `crab status` in a container.
+
+To streamline this approach in case of many simpacks, a utility script `monitor_crab_jobs.py` (inside the [monitoring](https://github.com/LukaLambrecht/private-sample-production/tree/main/monitoring) folder) is provided that runs the `./crab_command.sh status` script on multiple crab working directories and makes an overview of the results. 
 Example usage:
 
 ```
@@ -77,12 +98,42 @@ python3 monitor_crab_jobs.py -i ../run/simpacks/ -p x509up_u116295 -r
 ```
 
 This will scan the provided `simpacks` directory and run `./crab_command.sh status` on each of the CRAB working directories inside of it.
-The `-p` argument allows you to specify the path to an active proxy (to avoid having to type your password for generating a new one).
+The `-p` argument allows you to specify the path to an active proxy, to avoid having to type your password for generating a new one.
+In the example above, it was assumed that the proxy was present (e.g. by copying it over) in the `monitoring` directory.
 The `-r` argument means that `crab resubmit` should be called on failed jobs.
 
 The output of `monitor_crab_jobs.py` is an `index.html` file which you can open in a web browser, looking something like this:
 
 <img src="docs/crab_monitor_example.png" height="300px">
+
+### Checking causes of job crashes
+The reason for crashed jobs can be checked with the `--verboseErrors` arg to `crab status`, as explained above.
+Alternatively, click the Grafana link in the textual output of `crab status` (also linked in the overview generated by the `monitor_crab_jobs.py` script).
+Scroll to the 'Jobs Table' and click the `JobLog` link next to failed jobs for a full textual output of the job including the error that caused the crash.
+
+### Advanced resubmit options
+More advanced resubmit options can be passed to the monitoring script as well, e.g. as follows:
+
+```
+python3 monitor_crab_jobs.py -i ../run/simpacks/ -p x509up_u116295 -r --resubmit_args='--siteblacklist=T2_BE_IIHE --maxmemory=3500'
+```
+
+Notice the `=` sign and the single quotes; both are needed for this to work correctly.
+All resubmit options are documented in [this twiki](https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3Commands#crab_resubmit).
+
+### Running repetitive monitoring and resubmission
+The monitoring can be run in a cron job to have frequent (e.g. hourly) status updates without manually having to run the command every time.
+Resubmission can be included in this cron job as well, but make sure to not waste resources by resubmitting jobs again and again that keep failing because of a non-transient issue.
+For example, add the following to your acronab file (start editing this file with the command `acrontab -e`):
+
+```
+0 */4 * * * lxplus.cern.ch cd <path to monitoring directory>; bash monitor_crab_jobs.sh >> <some log file> 2>&1
+```
+
+For help with the first 5 elements in this statement, see e.g. [here](https://crontab.guru/).
+Check the script `monitor_crab_jobs.sh` for details; it's a simple wrapper around `monitor_crab_jobs.py` with some other convenient settings.
+Note that this script assumes that you copied a proxy (that remains valid for the entire time the cron job is active) to the `monitoring` directory.
+Slight tweaks of this script could be needed for each use case, e.g. enabling/disabling the `-r` option, or providing `--resubmit_args`.
 
 
 ## Merging CRAB output files
