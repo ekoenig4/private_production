@@ -18,8 +18,10 @@ if __name__=='__main__':
     for mass in args.masses:
         for year in args.years:
             # set gridpack, fragment and conditions
-            gridpack = '/afs/cern.ch/user/l/llambrec/gridpack-storage/HH-m-{}/'.format(mass)
-            gridpack += 'ggHH_slc7_amd64_gcc700_CMSSW_10_6_8_workdir_powheg_ggHH_SM_m_{}.tgz'.format(mass)
+            #gridpack = '/afs/cern.ch/user/l/llambrec/gridpack-storage/HH-m-{}/'.format(mass)
+            #gridpack += 'ggHH_slc7_amd64_gcc700_CMSSW_10_6_8_workdir_powheg_ggHH_SM_m_{}.tgz'.format(mass)
+            gridpack = '/afs/cern.ch/user/l/llambrec/gridpack-storage/HH-v2/'
+            gridpack += 'ggHH_slc7_amd64_gcc700_CMSSW_10_6_8_workdir_powheg_ggHH_central_mtdep2_patched_mH_{}.tgz'.format(mass)
             fragment = os.path.abspath('../../../genfragments/HHto4b_powheg')
             fragment = os.path.join(fragment, 'HHto4b_mH_{}_powheg.py'.format(mass))
             conditions = os.path.abspath('../../../conditions/conditions-{}'.format(year))
