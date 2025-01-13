@@ -22,8 +22,7 @@ For the original use case of this repository (double H boson production interfac
 
 **Processing sequence with correct conditions:** The final ingredient is a sequence of `cmsDriver` and `cmsRun` commands that define the whole processing from gridpack to LHE, GEN-SIM, PREMIX, AOD, MiniAOD and finally NanoAOD.
 This sequence is dependent on the data-taking conditions, and should be meticulously followed without any alteration if you want to avoid strange and completely uninformative crashes.
-The appropriate processing sequences can be retrieved from here [this PdmV TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun3Analysis).
-This page is for early Run-3, presumably similar pages exist for other data-taking eras; if not, consult an expert.
+See more info on where to get the correct sequence below.
 Examples are provided in the [conditions](ttps://github.com/LukaLambrecht/private-sample-production/tree/main/conditions) folder.
 Currently there are scripts for 2022 (preEE and postEE) and 2023 (preBPIX and postBPIX), perhaps to extend later.
 
@@ -35,6 +34,15 @@ git clone https://github.com/LukaLambrecht/private-sample-production.git
 
 Note: this repo has been developed and used on `lxplus` (and more specifically from an `/afs` home file system).
 Some modification might be needed on other systems, depending on the architecture, availability of central CMS software, CRAB settings, etc.
+
+## Get the correct conditions
+The appropriate processing sequences can be retrieved from here [this PdmV TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun3Analysis).
+This page is for early Run-3, presumably similar pages exist for other data-taking eras.
+
+A slightly more general approach (in case a useful summary TWiki page such as above does not exist) is as follows:
+- First find a representative dataset on [GrASP](https://cms-pdmv-prod.web.cern.ch/grasp) for the desired era. Follow the link to McM.
+- Alternatively, find a representative sample on DAS, follow the link to McM, and navigate to the corresponding chain.
+- From the McM page of each step in the chain, use the second button ('Get setup command') under the action menu to get the correct `cmsDriver` command.
 
 ## Make a simpack
 A simpack is a folder containing the gridpack, generator fragment, processing script, and any other files that might be needed.
