@@ -82,7 +82,7 @@ export SCRAM_ARCH=el8_amd64_gcc10
 build_cmssw 12_4_14_patch3
 run 0_HIG-Run3Summer22wmLHEGS \
     Configuration/GenProduction/python/fragment.py \
-    --fileout "file:0_HIG-Run3Summer22wmLHEGS.root" \
+    --fileout "file:ntuple.root" \
     --eventcontent NANOAODGEN \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --datatier NANOAOD \
