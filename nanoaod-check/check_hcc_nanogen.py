@@ -20,12 +20,6 @@ if __name__=='__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--inputfile', required=True, type=os.path.abspath,
       help='Path to NanoAOD input file')
-    #parser.add_argument('--xmin', default=100, type=int,
-    #  help='x-axis minimum for invariant mass plots')
-    #parser.add_argument('--xmax', default=150, type=int,
-    #  help='x-axis maximum for invariant mass plots')
-    #parser.add_argument('--nbins', default=50, type=int,
-    #  help='number of bins for invariant mass plots')
     args = parser.parse_args()
     print('Running check_hcc_nanogen.py with following configuration:')
     for arg in vars(args): print('  - {}: {}'.format(arg, getattr(args,arg)))
@@ -42,15 +36,15 @@ if __name__=='__main__':
     h = genparts[(genparts.pdgId==25) & (genparts.hasFlags(['isLastCopy']))]
     
     # print the number and mass of selected H bosons
-    #print('Number of selected H bosons:')
-    #print(ak.num(h.mass.compute()))
-    #print('H boson mass:')
-    #print(h.mass.compute())
+    print('Number of selected H bosons:')
+    print(ak.num(h.mass.compute()))
+    print('H boson mass:')
+    print(h.mass.compute())
 
     # find children of the selected H bosons
-    #h_children = h.children
-    #print('Pdg ID of H boson decay products:')
-    #print(h_children.pdgId.compute())
+    h_children = h.children
+    print('Pdg ID of H boson decay products:')
+    print(h_children.pdgId.compute())
 
     # select c-quarks
     cquarks = genparts[(
