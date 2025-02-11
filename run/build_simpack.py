@@ -8,6 +8,12 @@ import sys
 import six
 import argparse
 
+thisdir = os.path.abspath(os.path.dirname(__file__))
+topdir = os.path.abspath(os.path.join(thisdir, '../'))
+sys.path.append(topdir)
+
+from tools.patch_fragment import patch_fragment
+
 
 if __name__=='__main__':
 
@@ -130,3 +136,10 @@ if __name__=='__main__':
         patches.append("sed -i 's/config.Site.storageSite .*/config.Site.storageSite = \"{}\"/' {}".format(args.site, crabconfigfile))
     print('Patching the crab_config.py...')
     for patch in patches: os.system(patch)
+
+    # patch the generator fragment
+    # note: this is needed to make the fragment point to the correct gridpack!
+    fragment = newfragment
+    print('Patching the generator fagment...')
+    patch_fragment(fragment)
+    print('Done.')

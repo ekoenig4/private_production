@@ -245,6 +245,8 @@ if __name__ == '__main__':
       help='Path to your proxy (default: do not export proxy explicitly)')
     parser.add_argument('-t', '--test', default=False, action='store_true',
       help='Run in test mode, process only a few samples (default: False)')
+    parser.add_argument('-d', '--destination', default=None,
+      help='Path to copy results into (e.g. a CERNBox path) (default: None)')
     args = parser.parse_args()
     print('Running monitor_crab_jobs.py with following configuration:')
     for arg in vars(args): print('  - {}: {}'.format(arg, getattr(args,arg)))
@@ -420,6 +422,13 @@ if __name__ == '__main__':
     web(data, webpath)
     fullpath = os.path.join(webpath, 'index.html')
     print('Sample status written to {}.'.format(fullpath))
+
+    # copy html file to specified location
+    if args.destination is not None:
+        destination_dir = os.path.dirname(args.destination)
+        if not os.path.exists(destination_dir): os.makedirs(destination_dir)
+        os.system(f'cp {fullpath} {args.destination}')
+        print('Sample status copied to {}.'.format(args.destination))
 
     # print out command for downloading index.html file
     abspath = os.path.abspath(fullpath)

@@ -8,12 +8,14 @@
 echo "Running monitor_crab_jobs.sh"
 date
 
-# copy proxy in current directory to /tmp
-# (make sure proxy is valid for the entire expected duration of the crontab task)
-cp x509up_u116295 /tmp
-
 # this seems to be needed for scram and crab commands to be available
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 
+# copy proxy
+cp x509up_u116295 /tmp/
+
 # run the monitoring
-python3 monitor_crab_jobs.py -i ../run/simpacks/ -r
+python3 monitor_crab_jobs.py \
+-i ../run/simpacks/ \
+-d /eos/user/l/llambrec/private-sample-production/monitor_crab_jobs/index.html \
+"$@"

@@ -5,6 +5,10 @@ This is a repository for private CMS sample production.
 It is developed for samples with double H boson production decaying to 4 b-quarks with early Run-3 conditions,
 but should be generalizable to any other sample as long as the correct gridpack, generator fragment and condition processing sequence are provided.
 
+The general workflow is to gather all required input files into a single directory (called "simpack").
+Then, small tests can be run in the terminal and larger production can be submitted to CRAB from within the simpack.
+This framework provides tools for building the simpack and monitoring the CRAB jobs.
+
 ## References
 - This repo was originally forked from the [private production repo by Evan Koenig](https://github.com/ekoenig4/private_production).
 - The appropriate processing sequences can be retrieved from here [this PdmV TWiki](https://twiki.cern.ch/twiki/bin/view/CMS/PdmVRun3Analysis) (for early Run-3, presumably similar pages exist for other data-taking eras).
@@ -20,11 +24,26 @@ For the original use case of this repository (double H boson production with the
 Again it is best to consult an expert on the correct fragment to use.
 For the original use case of this repository (double H boson production interfaced with Pythia8 for decays to b-quarks), see the [genfragments/HHto4b_powheg](https://github.com/LukaLambrecht/private-sample-production/tree/main/genfragments/HHto4b_powheg) folder for examples.
 
+Note: it is important that the generator fragment points to the correct gridpack.
+Within the context of this framework, the specified gridpack is always copied to a simpack and renamed to `gridpack.tar.gz`.
+Hence, the correct syntax in the generator fragment is something like this (within the `externalLHEProducer block`):
+`args = cms.vstring(os.path.join(os.environ['PWD'], 'gridpack.tar.xz'))` (don't forget to `import os` if not done so before).
+See the provided fragments for examples.
+A small tool is implemented (in `build_simpack`, see below) that automatically finds and patches the line above in the provided fragment.
+For now, this is a quick and dirty patch, and it is advised to always check the patched fragment in the created simpack before CRAB submission.
+To do: make more robust so that arbitrary fragments can be provided as input.
+
 **Processing sequence with correct conditions:** The final ingredient is a sequence of `cmsDriver` and `cmsRun` commands that define the whole processing from gridpack to LHE, GEN-SIM, PREMIX, AOD, MiniAOD and finally NanoAOD.
 This sequence is dependent on the data-taking conditions, and should be meticulously followed without any alteration if you want to avoid strange and completely uninformative crashes.
 See more info on where to get the correct sequence below.
 Examples are provided in the [conditions](ttps://github.com/LukaLambrecht/private-sample-production/tree/main/conditions) folder.
-Currently there are scripts for 2022 (preEE and postEE) and 2023 (preBPIX and postBPIX), perhaps to extend later.
+Currently there are scripts for 2022 (preEE and postEE) and 2023 (preBPIX and postBPIX), and also for NanoGEN production.
+Perhaps to extend later.
+
+Note: it is important that the last step in this sequence has `ntuple.root` as its output file name (e.g. `--fileout "file:ntuple.root"`).
+This is because CRAB will be looking for an output file named like that, and will crash if it doesn't find one.
+It is possible to change this name, just keep it in sync with the name specified in `pset.py` (in the templates folder, copied to each simpack).
+To do: make this more robust so that arbitrary names can be provided in the processing sequence.
 
 **This repository:** Download this repo as follows:
 
