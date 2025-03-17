@@ -38,7 +38,7 @@ if __name__=='__main__':
       help='CRAB setting: number of events per job (default: leave unmodified wrt template)')
     parser.add_argument('--total_events', default=-1, type=int,
       help='CRAB setting: total number of events to generate (default: leave unmodified wrt template)')
-    parser.add_argument('-s', '--site', default=None,
+    parser.add_argument('-s', '--site', default='T3_CH_CERNBOX',
       help='CRAB setting: storage site (default: leave unmodified wrt template)')
     args = parser.parse_args()
     print('Running build_simpack.py with following configuration:')
@@ -118,24 +118,41 @@ if __name__=='__main__':
 
     # patch the crab configuration file
     crabconfigfile = os.path.join(simpack, 'crab_config.py')
-    patches = []
-    # output directory
-    outputdir = outputdir.replace('/', '\/')
-    patches.append("sed -i 's/config.Data.outLFNDirBase .*/config.Data.outLFNDirBase = \"{}\"/' {}".format(outputdir, crabconfigfile))
-    # work area subfolder (requestName)
-    patches.append("sed -i 's/config.General.requestName .*/config.General.requestName = \"{}\"/' {}".format(args.name, crabconfigfile))
-    # sample name (outputDatasetTag)    
-    patches.append("sed -i 's/config.Data.outputDatasetTag .*/config.Data.outputDatasetTag = \"{}\"/' {}".format(args.sample_name, crabconfigfile))
-    # number of jobs and events
-    if args.events_per_job > 0:
-        patches.append("sed -i 's/config.Data.unitsPerJob .*/config.Data.unitsPerJob = {}/' {}".format(args.events_per_job, crabconfigfile))
-    if args.total_events > 0:
-        patches.append("sed -i 's/config.Data.totalUnits .*/config.Data.totalUnits = {}/' {}".format(args.total_events, crabconfigfile))
-    # storage site
-    if args.site is not None:
-        patches.append("sed -i 's/config.Site.storageSite .*/config.Site.storageSite = \"{}\"/' {}".format(args.site, crabconfigfile))
+
     print('Patching the crab_config.py...')
-    for patch in patches: os.system(patch)
+    with open(crabconfigfile, 'r') as f:
+        crabconfig = f.read()
+
+    crabconfig = crabconfig.format(
+        requestName = args.name,
+        unitsPerJob = args.events_per_job,
+        totalUnits = args.total_events,
+        outLFNDirBase = outputdir,
+        outputDatasetTag = args.sample_name,
+        storageSite = args.site
+    )
+
+    with open(crabconfigfile, 'w') as f:
+        f.write(crabconfig)
+
+    # patches = []
+    # # output directory
+    # outputdir = outputdir.replace('/', '\/')
+    # patches.append("sed -i 's/config.Data.outLFNDirBase .*/config.Data.outLFNDirBase = \"{}\"/' {}".format(outputdir, crabconfigfile))
+    # # work area subfolder (requestName)
+    # patches.append("sed -i 's/config.General.requestName .*/config.General.requestName = \"{}\"/' {}".format(args.name, crabconfigfile))
+    # # sample name (outputDatasetTag)    
+    # patches.append("sed -i 's/config.Data.outputDatasetTag .*/config.Data.outputDatasetTag = \"{}\"/' {}".format(args.sample_name, crabconfigfile))
+    # # number of jobs and events
+    # if args.events_per_job > 0:
+    #     patches.append("sed -i 's/config.Data.unitsPerJob .*/config.Data.unitsPerJob = {}/' {}".format(args.events_per_job, crabconfigfile))
+    # if args.total_events > 0:
+    #     patches.append("sed -i 's/config.Data.totalUnits .*/config.Data.totalUnits = {}/' {}".format(args.total_events, crabconfigfile))
+    # # storage site
+    # if args.site is not None:
+    #     patches.append("sed -i 's/config.Site.storageSite .*/config.Site.storageSite = \"{}\"/' {}".format(args.site, crabconfigfile))
+    # print('Patching the crab_config.py...')
+    # for patch in patches: os.system(patch)
 
     # patch the generator fragment
     # note: this is needed to make the fragment point to the correct gridpack!

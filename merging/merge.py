@@ -31,6 +31,8 @@ if __name__=='__main__':
           +' (choose an intallation compatible with current el9 lxplus architecture, e.g. 14+)')
     parser.add_argument('-r', '--runmode', default='condor', choices=['condor','local'],
       help='Run in condor job or locally in the terminal')
+    parser.add_argument('--no-replace', action='store_true', default=False,
+                        help='Exit if output directory already exists')
     args = parser.parse_args()
     print('Running merge.py with following configuration:')
     for arg in vars(args): print('  - {}: {}'.format(arg, getattr(args,arg)))
@@ -71,20 +73,60 @@ if __name__=='__main__':
         msg = 'WARNING: output directory {} already exists'.format(args.outputdir)
         msg += ', clean it? (y/n)'
         print(msg)
+
+        if args.no_replace: sys.exit()
+
         go = six.moves.input()
         if go!='y': sys.exit()
         os.system('rm -r {}'.format(args.outputdir))
     os.makedirs(args.outputdir)
 
-    # loop over groups
-    for outputfile, inputfiles in iostruct.items():
-        # make the haddnano command
-        haddnano = 'haddnano.py'
-        haddnano += ' {}'.format(os.path.join(args.outputdir,outputfile))
-        for f in inputfiles: haddnano += ' {}'.format(f)
-        # run the command
-        if args.runmode=='local':
-            cmd = haddnano
-            if cmssw is not None: cmd = 'cd {}; cmsenv; '.format(cmssw) + haddnano
+    import luigi
+    class cjob_merge(luigi.Task):
+        outputfile = luigi.Parameter()
+        inputfiles = luigi.ListParameter()
+        cmssw = luigi.Parameter()
+
+        def haddnano(self):
+            # make the haddnano command
+            haddnano = 'haddnano.py'
+            haddnano += ' {}'.format(os.path.join(args.outputdir, self.outputfile))
+            for f in self.inputfiles: haddnano += ' {}'.format(f)
+
+            return haddnano
+
+        def local(self):
+            cmd = self.haddnano()
+
+            if self.cmssw:
+                cmd = f'cd {self.cmssw}; cmsenv; {cmd}'
+
             os.system(cmd)
-        elif args.runmode=='condor': ct.submitCommandAsCondorJob('cjob_merge', haddnano, cmssw_version=cmssw)
+
+        def condor(self):
+            # make self.task_id directory
+
+            os.makedirs(f'jobs/{self.task_id}', exist_ok=True)
+            ct.submitCommandAsCondorJob(f'jobs/{self.task_id}/submit', self.haddnano(), cmssw_version=self.cmssw)
+
+
+    # loop over groups
+    commands = [
+        cjob_merge(outputfile, inputfiles, cmssw)
+        for outputfile, inputfiles in iostruct.items()
+    ]
+    
+    from tqdm import tqdm
+    # run the command
+    if args.runmode=='local':
+        for cmd in tqdm(commands, desc='Running merge'):
+            cmd.local()
+
+    elif args.runmode=='condor': 
+        import concurrent.futures as cf
+
+        with cf.ThreadPoolExecutor(max_workers=None) as executor:
+            futures = [executor.submit(cmd.condor) for cmd in commands]
+            for future in tqdm(cf.as_completed(futures), total=len(futures), desc='Running merge'):
+                future.result()
+

@@ -3,6 +3,8 @@
 import os
 import sys
 import argparse
+
+from tqdm import tqdm
 import das_client
 
 sys.path.append(os.path.abspath('../../jobtools'))
@@ -65,24 +67,23 @@ if __name__=='__main__':
     # define log file for writing progress
     logfile = 'log_' + os.path.splitext(os.path.basename(args.outputfile))[0] + '.txt'
 
-    # loop over files
-    files_to_sites = {}
-    for fileidx, file in enumerate(files):
+    import concurrent.futures
 
-        # write progress to screen and to a log file
-        step = 10 if args.level == 'block' else 100
-        if fileidx < 10 or (fileidx+1) % step == 0:
-            msg = 'Finding sites for {} {}/{}...'.format(args.level, fileidx+1, len(files))
-            print(msg, end='\r')
-            with open(logfile,'a') as f: f.write(msg + '\n')
-
-        # find sites for file
+    def find_sites(file):
         dasquery = 'site {}={}'.format(args.level, file)
         sites = das_client.get_data(dasquery)
-        if sites['status'] != 'ok': raise Exception(str(sites))
+        if sites['status'] != 'ok':
+            raise Exception(str(sites))
         sites = sites['data']
         sites = [el['site'][0]['name'] for el in sites]
-        sites = list(set(sites))
+        return file, list(set(sites))
+
+    # loop over files with multithreading
+    files_to_sites = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=24) as executor:
+        results = list(tqdm(executor.map(find_sites, files), total=len(files), desc='Finding sites for {}s'.format(args.level)))
+    
+    for file, sites in results:
         files_to_sites[file] = sites
 
     # get files with disk access
