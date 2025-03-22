@@ -10,15 +10,19 @@ fi
 
 conditions=(
     2021/2022-preEE
-    # 2022/2022-postEE
-    # 2023/2023-preBPIX
-    # 2020/2023-postBPIX
+    2022/2022-postEE
+    2023/2023-preBPIX
+    2020/2023-postBPIX
 )
 
+GRIDPATH=/cmsuf/data/store/user/ekoenig/gridpacks
+
 for condition in ${conditions[@]}; do
+    year=$(dirname $condition)
+    condition=$(basename $condition)
     python build_simpack.py \
-        -g input/ggZHto4b_Run3/ggHZ_slc7_amd64_gcc10_CMSSW_12_4_21_ggZH.tgz \
-        -f input/ggZHto4b_Run3/ggZHto4b_fragment.py \
+        -g ${GRIDPATH}/ggZHto4b_Run3/ggHZ_slc7_amd64_gcc10_CMSSW_12_4_21_ggZH.tgz \
+        -f ${GRIDPATH}/ggZHto4b_Run3/ggZHto4b_fragment.py \
         -c ../conditions/conditions-${condition} \
         --container cmssw-el8 \
         -s T2_US_Florida \

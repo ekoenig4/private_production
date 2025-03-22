@@ -15,13 +15,15 @@ conditions=(
     2020/2023-postBPIX
 )
 
+GRIDPATH=/cmsuf/data/store/user/ekoenig/gridpacks
+
 for condition in ${conditions[@]}; do
     year=$(dirname $condition)
     condition=$(basename $condition)
 
     python build_simpack.py \
-        -g /eos/home-e/ekoenig/gridpacks/ZHto4b_Run3/HZJ_13p6TeV_slc7_amd64_gcc10_CMSSW_12_4_21_ZH.tgz \
-        -f /eos/home-e/ekoenig/gridpacks/ZHto4b_Run3/ZHto4B_powheg.py \
+        -g ${GRIDPATH}/ZHto4b_Run3/HZJ_13p6TeV_slc7_amd64_gcc10_CMSSW_12_4_21_ZH.tgz \
+        -f ${GRIDPATH}/ZHto4b_Run3/ZHto4B_powheg.py \
         -c ../conditions/conditions-${condition} \
         --container cmssw-el8 \
         -s T2_US_Florida \
