@@ -2,11 +2,17 @@
 
 # Usage: sh input/ZZto4b_Run3/build_simpacks.sh
 
+version=$1
+
+if [ ! -z $version ]; then
+    version="_${version}"
+fi
+
 conditions=(
-    2022-preEE
-    2022-postEE
-    2023-preBPIX
-    2023-postBPIX
+    2021/2022-preEE
+    # 2022/2022-postEE
+    # 2023/2023-preBPIX
+    # 2020/2023-postBPIX
 )
 
 for condition in ${conditions[@]}; do
@@ -15,8 +21,10 @@ for condition in ${conditions[@]}; do
         -f input/ggZHto4b_Run3/ggZHto4b_fragment.py \
         -c ../conditions/conditions-${condition} \
         --container cmssw-el8 \
-        -n ggZH_HToBB_ZToBB_M-125_${condition} \
+        -s T2_US_Florida \
+        -o private-sample-production/${year}/mc \
+        -n ggZH_HToBB_ZToBB_M-125_${condition}${version} \
         --sample_name ggZH_HToBB_ZToBB_M-125_${condition} \
-        --events_per_job 100 \
-        --total_events 800000 
+        --events_per_job 500 \
+        --total_events 5000000
 done
