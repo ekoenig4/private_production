@@ -94,8 +94,6 @@ run 0_HIG-RunIII2024Summer24wmLHEGS \
     --no_exec \
     --mc || exit $? ;
 
-export SCRAM_ARCH=el8_amd64_gcc12
-build_cmssw 14_0_21
 run 1_HIG-RunIII2024Summer24DRPremix \
     --era Run3_2024 \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
@@ -112,9 +110,21 @@ run 1_HIG-RunIII2024Summer24DRPremix \
     --no_exec \
     --mc || exit $? ;
 
-export SCRAM_ARCH=el8_amd64_gcc12
+run 2_HIG-RunIII2024Summer24DRPremix \
+    --era Run3_2024 \
+    --customise Configuration/DataProcessing/Utils.addMonitoring \
+    --step RAW2DIGI,L1Reco,RECO,RECOSIM \
+    --geometry DB:Extended \
+    --conditions 140X_mcRun3_2024_realistic_v26 \
+    --datatier AODSIM \
+    --eventcontent AODSIM \
+    --fileout file:2_HIG-RunIII2024Summer24DRPremix-00302.root \
+    --filein file:1_HIG-RunIII2024Summer24DRPremix-00302_0.root \
+    --no_exec \
+    --mc || exit $? ;
+
 build_cmssw 15_0_4
-run 2_HIG-RunIII2024Summer24MiniAODv6 \
+run 3_HIG-RunIII2024Summer24MiniAODv6 \
     --era Run3_2024 \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
     --step PAT \
@@ -122,15 +132,13 @@ run 2_HIG-RunIII2024Summer24MiniAODv6 \
     --conditions 150X_mcRun3_2024_realistic_v2 \
     --datatier MINIAODSIM \
     --eventcontent MINIAODSIM1 \
-    --fileout file:2_HIG-RunIII2024Summer24MiniAODv6-00302.root \
-    --filein file:1_HIG-RunIII2024Summer24DRPremix-00302_0.root \
+    --fileout file:3_HIG-RunIII2024Summer24MiniAODv6-00302.root \
+    --filein file:2_HIG-RunIII2024Summer24DRPremix-00302.root \
     --no_exec \
     --mc || exit $? ;
 
 # NanoAOD step
-export SCRAM_ARCH=el8_amd64_gcc12
-build_cmssw 15_0_4
-run 3_HIG-RunIII2024Summer24NanoAODv15 \
+run 4_HIG-RunIII2024Summer24NanoAODv15 \
     --scenario pp \
     --era Run3_2024 \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
@@ -139,8 +147,8 @@ run 3_HIG-RunIII2024Summer24NanoAODv15 \
     --datatier NANOAODSIM \
     --eventcontent NANOEDMAODSIM1 \
     --python_filename HIG-RunIII2024Summer24NanoAODv15-00303_1_cfg.py \
-    --fileout file:3_HIG-RunIII2024Summer24NanoAODv15-00303.root \
-    --filein file:2_HIG-RunIII2024Summer24MiniAODv6-00302.root \
+    --fileout file:ntuple.root \
+    --filein file:3_HIG-RunIII2024Summer24MiniAODv6-00302.root \
     --no_exec \
     --mc || exit $? ;
 
