@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source crabenv.sh
+source ./crabenv.sh
 
 pushd $CMSSW_VERSION/src > /dev/null
 eval `scram runtime -sh`

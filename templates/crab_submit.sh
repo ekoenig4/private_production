@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source crabenv.sh
+source ./crabenv.sh
 
 # if hostname ends with .ufhpc, then we are on UF HPC
 if [[ $(hostname) == *.ufhpc ]]; then
