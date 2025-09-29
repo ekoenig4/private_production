@@ -1,7 +1,6 @@
 #!/bin/bash
 
-export SCRAM_ARCH=el8_amd64_gcc11
-export CMSSW_VERSION=CMSSW_13_0_13
+source crabenv.sh
 
 pushd $CMSSW_VERSION/src > /dev/null
 eval `scram runtime -sh`

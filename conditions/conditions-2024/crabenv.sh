@@ -1,0 +1,2 @@
+export SCRAM_ARCH=el8_amd64_gcc12
+export CMSSW_VERSION=CMSSW_15_0_4

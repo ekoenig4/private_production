@@ -1,7 +1,13 @@
 #!/bin/bash
 
-export SCRAM_ARCH=el8_amd64_gcc11
-export CMSSW_VERSION=CMSSW_13_0_13
+source crabenv.sh
+
+# if hostname ends with .ufhpc, then we are on UF HPC
+if [[ $(hostname) == *.ufhpc ]]; then
+    source /cvmfs/oasis.opensciencegrid.org/osg-software/osg-wn-client/current/el9-x86_64/setup.sh
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/cmsuf/podman/data1/lib
+    export PATH=$PATH:/cmsuf/podman/data1/bin
+fi
 
 scram p CMSSW $CMSSW_VERSION
 pushd $CMSSW_VERSION/src
