@@ -145,7 +145,7 @@ run 4_HIG-RunIII2024Summer24NanoAODv15 \
     --step NANO \
     --conditions 150X_mcRun3_2024_realistic_v2 \
     --datatier NANOAODSIM \
-    --eventcontent NANOEDMAODSIM1 \
+    --eventcontent NANOAODSIM \
     --python_filename HIG-RunIII2024Summer24NanoAODv15-00303_1_cfg.py \
     --fileout file:ntuple.root \
     --filein file:3_HIG-RunIII2024Summer24MiniAODv6-00302.root \
