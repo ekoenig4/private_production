@@ -9,13 +9,15 @@ if [ ! -z $version ]; then
 fi
 
 conditions=(
-    2021/2022-preEE
-    2022/2022-postEE
-    2023/2023-preBPIX
-    2020/2023-postBPIX
+    # 2021/2022-preEE
+    # 2022/2022-postEE
+    # 2023/2023-preBPIX
+    # 2020/2023-postBPIX
+    2024/2024
 )
 
 GRIDPATH=/cmsuf/data/store/user/ekoenig/gridpacks
+GRIDPATH=/eos/home-e/ekoenig/gridpacks
 
 for condition in ${conditions[@]}; do
     year=$(dirname $condition)
@@ -29,6 +31,6 @@ for condition in ${conditions[@]}; do
         -o private-sample-production/${year}/mc \
         -n ggZH_HToBB_ZToBB_M-125_${condition}${version} \
         --sample_name ggZH_HToBB_ZToBB_M-125_${condition} \
-        --events_per_job 500 \
-        --total_events 5000000
+        --events_per_job 5000 \
+        --total_events 50000000
 done
