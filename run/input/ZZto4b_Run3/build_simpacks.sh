@@ -28,8 +28,9 @@ for condition in ${conditions[@]}; do
         -c ../conditions/conditions-${condition} \
         --container cmssw-el8 \
         -s T2_US_Florida \
+        -o private-sample-production/${year}/mc \
         -n ZZTo4B01j_5f_NLO_FXFX_${condition}${version} \
         --sample_name ZZTo4B01j_5f_NLO_FXFX_${condition} \
-        --events_per_job 5000 \
-        --total_events 50000000
+        --events_per_job 500 \
+        --total_events 5000 
 done

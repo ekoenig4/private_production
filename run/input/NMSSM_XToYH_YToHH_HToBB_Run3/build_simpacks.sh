@@ -26,7 +26,8 @@ conditions=(
     2024/2024
 )
 
-GRIDPATH=/eos/home-e/ekoenig/gridpacks/NMSSM_XToYH_YToHH_Run3
+# GRIDPATH=/eos/home-e/ekoenig/gridpacks/NMSSM_XToYH_YToHH_Run3
+GRIDPATH=/blue/avery/ekoenig/analysis/private_gridpacks/gridpacks
 
 for mass in ${masses[@]}; do
     echo "Processing mass point: $mass"
