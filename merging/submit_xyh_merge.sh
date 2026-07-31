@@ -1,9 +1,6 @@
 INPUT_PATH=/cmsuf/data/store/user/ekoenig/private-sample-production
 INPUTS=(
-2021/mc/CRAB_PrivateMC/ZZTo4B01j_5f_NLO_FXFX_2022-preEE
-2022/mc/CRAB_PrivateMC/ZZTo4B01j_5f_NLO_FXFX_2022-postEE
-2023/mc/CRAB_PrivateMC/ZZTo4B01j_5f_NLO_FXFX_2023-preBPIX
-2020/mc/CRAB_PrivateMC/ZZTo4B01j_5f_NLO_FXFX_2023-postBPIX
+    2024/mc/CRAB_PrivateMC/NMSSM_XToYH_YToHH_HToBB_MX_700_MY_400_2024
 )
 
 for INPUT in ${INPUTS[@]}; do

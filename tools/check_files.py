@@ -68,7 +68,7 @@ def check_directory(directory, pattern, maxfiles=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Check files in directories.")
     parser.add_argument("directories", nargs="+", help="List of directories to search")
-    parser.add_argument("--pattern", default='ntuple*.root', help="Pattern to match files")
+    parser.add_argument("--pattern", default='ntuple.*.root', help="Pattern to match files")
     parser.add_argument("--maxfiles", default=None, help="Maximum files to consider per directory. default = None", type=int)
 
     args = parser.parse_args()

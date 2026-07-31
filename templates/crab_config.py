@@ -30,7 +30,7 @@ config.JobType.pluginName  = 'PrivateMC'
 # set the parameter set file (do not change, it is only a dummy, formally needed by CRAB)
 config.JobType.psetName    = 'pset.py'
 # set the requested memory limit
-config.JobType.maxMemoryMB = 5000
+config.JobType.maxMemoryMB = 3000
 # set the auxiliary files and folders that should be copied to the worker node.
 # note: the *.txt can hold any auxiliary files in txt format present in the simpack.
 config.JobType.inputFiles  = ['run_in_container.sh', 'nanoaod_run.sh', 'Configuration', 'gridpack.tar.xz', '*.txt']

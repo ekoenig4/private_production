@@ -12,8 +12,8 @@ conditions=(
     # 2021/2022-preEE
     # 2022/2022-postEE
     # 2023/2023-preBPIX
-    # 2020/2023-postBPIX
-    2024/2024
+    2020/2023-postBPIX
+    # 2024/2024
 )
 
 GRIDPATH=/cmsuf/data/store/user/ekoenig/gridpacks

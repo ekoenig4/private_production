@@ -61,7 +61,7 @@ run() {
 
     echo "================= CMSRUN starting $SCRIPT step ===================="
 
-    cmsRun -e -j $REPORT_NAME $SCRIPT.py
+    /usr/bin/time -v cmsRun -e -j $REPORT_NAME $SCRIPT.py
     status=$?
 
     if [ $status -ne 0 ]; then
