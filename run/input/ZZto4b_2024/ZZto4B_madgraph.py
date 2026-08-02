@@ -43,6 +43,8 @@ generator = cms.EDFilter(
             'JetMatching:qCutME = 20.',#this must match the ptj cut in the lhe generation step
             'JetMatching:nQmatch = 5', #4 corresponds to 4-flavour scheme (no matching of b-quarks), 5 for 5-flavour scheme
             'JetMatching:nJetMax = 1', #number of partons in born matrix element for highest multiplicity
+            '23:onMode = off', #turn off all Z decays
+            '23:onIfMatch = 5 -5', #turn on Z->bb decays only
           ),
         parameterSets = cms.vstring('pythia8CommonSettings',
                                     'pythia8CP5Settings',
