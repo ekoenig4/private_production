@@ -5,7 +5,7 @@ source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 # if hostname ends with .ufhpc, then we are on UF HPC
 if [[ $(hostname) == *.ufhpc ]]; then
-    source /cvmfs/oasis.opensciencegrid.org/osg-software/osg-wn-client/current/el8-x86_64/setup.sh
+    source /cvmfs/oasis.opensciencegrid.org/osg-software/osg-wn-client/3.6/current/el9-x86_64/setup.sh
     export X509_CERT_DIR=/cvmfs/cms.cern.ch/grid/etc/grid-security/certificates
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/cmsuf/podman/data1/lib
     export PATH=$PATH:/cmsuf/podman/data1/bin
